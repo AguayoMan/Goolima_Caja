@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAG</title>
+    <link rel="icon" href="/static/imagenes/ColoresLogo.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+      body {
+        background: linear-gradient(180deg, #000000, #3a933ac0 50%, #000000),
+                    linear-gradient(90deg, #000000, #12095cc0 50%, #000000);
+        background-blend-mode: screen;
+        background-color: #3bc23bc0; /* Color de fondo verde */
+        background-size: cover;   /* Para que ocupe toda la pantalla */
+    }
+    .table-wrapper {
+        margin: 20px;
+    }
+    .btn-custom {
+        margin-right: 5px;
+    }
+
+    label {
+        color: black;
+    }
+
+    h2, h3 {
+        color: black;
+    }
+</style>
+<body>
+    <!-- Navbar -->
+<nav class="navbar navbar-expand-lg" style="background-color: black;">
+    <a class="navbar-brand" href="#" style="color: white;">
+        <img src="/static/imagenes/ColoresLogo.png" alt="Logo" style="width: 40px; height: auto;">
+    </a>
+    <a class="navbar-brand" href="#" style="color: white;">
+        <img src="/static/imagenes/goolima logo blanco.png" alt="Logo" style="width: 40px; height: auto;">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-file-alt"></i> Ordenes
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/O">Pendientes/Abiertas</a></li>
+                    <li><a class="dropdown-item" href="/OC">Pendientes/Abiertas a credito</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-users"></i> Clientes
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/ClientesDeuda">Creditos</a></li>
+                    <li><a class="dropdown-item" href="/C">Agregar</a></li>
+                    <li><a class="dropdown-item" href="/ClientesEliminar">Eliminar/Editar</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-users"></i> Productos
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/P">Agregar</a></li>
+                    <li><a class="dropdown-item" href="/ProductosEliminar">Eliminar/Editar</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-file-alt"></i> Usuarios
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/U">Agregar</a></li>
+                    <li><a class="dropdown-item" href="/UsuariosEliminar">Eliminar/Editar</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-file-alt"></i> Reportes
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/OrdenesPendientes">Inventario</a></li>
+                    <li><a class="dropdown-item" href="/OrdenesPendientes">Ingresos</a></li>
+                </ul>
+            </li>
+        </ul>
+
+        <!-- Este ul se mantiene pegado a la derecha -->
+        <ul class="navbar-nav" style="margin-left: auto;">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-user-circle"></i> {{ session['username'] }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/ClientesConsultarCaja">Cerrar Sesión</a></li>
+                </ul>
+            </li>
+        </ul>
+        
+    </div>
+</nav>
+
+    <!-- Formulario de registro de venta -->
+    <div class="container table-wrapper">
+        <img src="/static/imagenes/goolima logo negro.png" alt="Logo Goolima" style="width:100px; height:auto;">
+
+        <h2>Registro de Venta</h2>
+        <form id="venta-form" action="/TerminarVenta" method="post">
+            <div class="form-group">
+                <label for="ordenRapida">Crédito</label>
+                <input type="checkbox" id="ordenRapida" name="ordenRapida" value="1" onchange="toggleClienteSection(); toggleBotonTexto();">
+            </div>
+
+            <div id="cliente-section" style="display: none;">
+                <label for="exampleCliente">Nombre Cliente</label>
+                <select id="Cliente" class="form-select" aria-label="Default select example" name="Cliente">
+                    <option disabled selected value="">Cliente</option>
+                    {% for data in data %}
+                        <option value="{{ data[0] }}" clienteDescuento="{{ data[1] }}">{{ data[0] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Abreviatura</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-select" id="producto-input" onchange="syncAbreviatura()" required>
+                                <option disabled selected value="">Producto</option>
+                                {% for Producto in producto %}
+                                    <option value="{{ Producto[0] }}" data-abreviatura="{{ Producto[1] }}" data-precio="{{ Producto[2] }}" data-disponible="{{ Producto[3] }}">{{ Producto[0] }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" id="abreviatura-input" placeholder="ejemplo: VMEG" onchange="syncProducto()" required>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" id="cantidad-input" placeholder="Cantidad" min="1" value="1" required>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" id="precio-input" placeholder="Precio" disabled>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="btn-wrapper">
+                <button type="button" class="btn btn-primary" onclick="addItem()">Agregar Artículo</button>
+            </div>
+        </form>
+
+        <!-- Tabla que muestra la nota de venta -->
+        <h3></h3>
+        <h3></h3>
+        <h3>Nota de Venta</h3>
+        <table class="table table-bordered" id="nota-venta">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Abreviatura</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="nota-venta-body">
+                <!-- Las filas se añadirán dinámicamente aquí -->
+            </tbody>
+            <tfoot>
+                <tr id="fila-total">
+                    <td colspan="4" class="text-end"><strong>Total de la Venta:</strong></td>
+                    <td><strong>$<span id="total-general">0.00</span></strong></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Botón con id para cambiar su texto dinámicamente -->
+        <button type="submit" id="boton-terminar" class="btn btn-success">Cobrar</button>
+    </div>
+
+<!-- Modal de Cobro -->
+<div class="modal fade" id="modalCobro" tabindex="-1" aria-labelledby="modalCobroLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCobroLabel">Cobro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Total a Pagar: $<span id="total-a-pagar">0.00</span></strong></p>
+                <div class="form-group">
+                    <label for="formaPago">Forma de Pago</label>
+                    <select class="form-select" id="formaPago" name="formaPago" required onchange="mostrarCamposDePago()">
+                        <option disabled selected value="">Seleccionar forma de pago</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Tarjeta">Tarjeta debito/credito</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+                </div>
+
+                <!-- Campo para ingresar el efectivo recibido -->
+                <div class="form-group mt-3" id="campo-efectivo" style="display: none;">
+                    <label for="efectivoRecibido">Efectivo Recibido</label>
+                    <input type="number" class="form-control" id="efectivoRecibido" placeholder="Ingresa la cantidad de efectivo" min="0" oninput="calcularCambio()">
+                </div>
+
+                <!-- Campo para ingresar el monto de transferencia/tarjeta -->
+                <div class="form-group mt-3" id="campo-transferencia-tarjeta" style="display: none;">
+                    <label for="transferenciaTarjetaRecibido">Monto Tarjeta/Transferencia</label>
+                    <input type="number" class="form-control" id="TransferenciaTarjetaRecibido" placeholder="Ingresa la cantidad a pagar" min="0">
+                </div>
+
+                <!-- Campo para mostrar el cambio -->
+                <div class="form-group mt-3" id="campo-cambio" style="display: none;">
+                    <label for="cambio">Cambio</label>
+                    <input type="text" class="form-control" id="cambio" placeholder="Cambio" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" onclick="enviarNotaVenta()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Nueva variable para almacenar la nota de venta
+    let notaVenta = [];
+
+
+        // Sincronizar abreviatura y producto
+    function syncAbreviatura() {
+        var productoSelect = document.getElementById('producto-input');
+        var abreviaturaInput = document.getElementById('abreviatura-input');
+        var precioInput = document.getElementById('precio-input');
+        var selectedOption = productoSelect.options[productoSelect.selectedIndex];
+
+        if (selectedOption) {
+            abreviaturaInput.value = selectedOption.getAttribute('data-abreviatura');
+            precioInput.value = selectedOption.getAttribute('data-precio');
+        }
+    }
+
+    function syncProducto() {
+        var abreviaturaInput = document.getElementById('abreviatura-input').value;
+        var productoSelect = document.getElementById('producto-input');
+
+        for (var i = 0; i < productoSelect.options.length; i++) {
+            if (productoSelect.options[i].getAttribute('data-abreviatura') === abreviaturaInput) {
+                productoSelect.selectedIndex = i;
+                document.getElementById('precio-input').value = productoSelect.options[i].getAttribute('data-precio');
+                break;
+            }
+        }
+    }
+
+    // Mostrar u ocultar cliente si es venta a crédito
+    function toggleClienteSection() {
+        var clienteSection = document.getElementById('cliente-section');
+        var creditoCheckbox = document.getElementById('ordenRapida');
+        clienteSection.style.display = creditoCheckbox.checked ? 'block' : 'none';
+    }
+
+    // Cambiar texto del botón
+    function toggleBotonTexto() {
+        var boton = document.getElementById('boton-terminar');
+        var creditoCheckbox = document.getElementById('ordenRapida');
+        boton.textContent = creditoCheckbox.checked ? 'Generar Orden de Crédito' : 'Cobrar';
+    }
+
+    // Mostrar modal si es cobro
+    document.getElementById('boton-terminar').addEventListener('click', function (event) {
+        const tg = parseFloat(document.getElementById('total-general').textContent);
+        if (this.textContent === 'Cobrar') {
+            if (notaVenta.length == 0 || tg==0){
+                alert("Ingrese datos para la venta.");
+            }else{        
+                event.preventDefault(); // Evitar que el formulario se envíe automáticamente
+                document.getElementById('total-a-pagar').textContent = document.getElementById('total-general').textContent; // Actualizar el total en el modal
+                var modal = new bootstrap.Modal(document.getElementById('modalCobro'));
+                modal.show();
+            }
+        }
+    });
+
+        // Accion si es credito
+        document.getElementById('boton-terminar').addEventListener('click', function (event) {
+        const Cliente = document.querySelector("#Cliente").value;
+        const tg = parseFloat(document.getElementById('total-general').textContent);
+        if (this.textContent === 'Generar Orden de Crédito') {
+            if (notaVenta.length == 0 || Cliente=="" || tg==0){
+                alert("Ingrese todos los datos para la orden de venta.");
+            }else{
+            event.preventDefault(); // Evitar que el formulario se envíe automáticamente
+            document.getElementById('total-a-pagar').textContent = document.getElementById('total-general').textContent; // Actualizar el total en el modal
+            enviarOrdenCredito();
+            }
+        }
+    });
+
+
+
+// Agregar artículo a la tabla de Nota de Venta
+function addItem() {
+    var productoInput = document.getElementById('producto-input');
+    var abreviaturaInput = document.getElementById('abreviatura-input');
+    var cantidadInput = document.getElementById('cantidad-input');
+    var precioInput = parseFloat(document.getElementById('precio-input').value); // Obtener el valor del precio como número
+
+    // Validar que todos los campos estén llenos
+    if (!productoInput.value || !abreviaturaInput.value || !cantidadInput.value || isNaN(precioInput)) {
+        alert("Por favor complete todos los campos.");
+        return;
+    }
+
+    // Aplicar descuento si corresponde
+    var selectCliente = document.getElementById('Cliente').selectedOptions[0];
+    var clienteDescuento = parseFloat(selectCliente.getAttribute('clienteDescuento')) / 100; // Convertir a decimal
+
+    var selectProducto = document.getElementById('producto-input').selectedOptions[0];
+    var disponibleParaDescuento = parseInt(selectProducto.getAttribute('data-disponible')); // Verificar si está disponible para descuento
+
+    // Si el producto es elegible para descuento y el cliente tiene descuento
+    if (selectCliente.value && disponibleParaDescuento === 1) {
+        precioInput = precioInput - (precioInput * clienteDescuento); // Aplicar el descuento
+    }
+
+    var tabla = document.getElementById('nota-venta-body');
+    var filas = tabla.getElementsByTagName('tr');
+    var existe = false;
+
+    // Verificar si el producto ya existe en la tabla
+    for (var i = 0; i < filas.length; i++) {
+        var fila = filas[i];
+        var productoExistente = fila.cells[0].textContent;
+        var abreviaturaExistente = fila.cells[1].textContent;
+
+        if (productoExistente === productoInput.value && abreviaturaExistente === abreviaturaInput.value) {
+            // Si el producto ya existe, actualizar cantidad y total
+            var cantidadExistente = parseInt(fila.cells[2].textContent);
+            var nuevaCantidad = cantidadExistente + parseInt(cantidadInput.value);
+            fila.cells[2].textContent = nuevaCantidad;
+
+            var nuevoTotal = precioInput * nuevaCantidad;
+            fila.cells[4].textContent = nuevoTotal.toFixed(2);
+
+            existe = true;
+            break;
+        }
+    }
+
+    if (!existe) {
+        // Si el producto no existe, agregar una nueva fila
+        var nuevaFila = tabla.insertRow();
+        nuevaFila.insertCell(0).textContent = productoInput.value;
+        nuevaFila.insertCell(1).textContent = abreviaturaInput.value;
+        nuevaFila.insertCell(2).textContent = cantidadInput.value;
+        nuevaFila.insertCell(3).textContent = precioInput.toFixed(2); // Mostrar el precio con descuento aplicado si corresponde
+        var total = precioInput * parseInt(cantidadInput.value);
+        nuevaFila.insertCell(4).textContent = total.toFixed(2);
+
+        // Crear una celda para el botón de acción
+        var celdaAcciones = nuevaFila.insertCell(5);
+
+        // Crear el botón de borrar
+        var botonBorrar = document.createElement('button');
+        botonBorrar.textContent = 'Borrar';
+        botonBorrar.className = 'btn btn-danger btn-custom';
+        botonBorrar.onclick = function() {
+        // Solicita la contraseña o código al usuario
+        let codigoIngresado = prompt ("Ingrese la contraseña del Administrador/Supervisor:");
+        
+        // Verificar la contraseña ingresada
+        if (codigoIngresado) {
+            fetch('/verificar_contraseña', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ codigo: codigoIngresado })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Contraseña incorrecta o usuario no autorizado');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.valid) {
+                    // Si la contraseña es válida, eliminar la fila
+                    deleteRow(this, productoInput.value, abreviaturaInput.value);
+                } else {
+                    alert("Contraseña incorrecta o usuario no autorizado");
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
+    };
+
+        // Añadir el botón a la celda
+        celdaAcciones.appendChild(botonBorrar);
+    }
+
+    // Añadir el artículo a la variable notaVenta
+    var producto = productoInput.value;
+    var abreviatura = abreviaturaInput.value;
+    var cantidad = parseInt(cantidadInput.value);
+    var total = precioInput * cantidad; // Total con descuento aplicado
+
+    notaVenta.push({ producto, abreviatura, cantidad, precio: precioInput, total });
+
+    calcularTotalGeneral(); // Calcular el nuevo total general
+    resetForm(); // Limpiar el formulario
+}
+
+
+    // Función para eliminar una fila
+function deleteRow(button) {
+    var fila = button.parentNode.parentNode; // Obtener la fila del botón
+
+    // Obtener el producto y abreviatura de la fila
+    var producto = fila.cells[0].textContent;
+    var abreviatura = fila.cells[1].textContent;
+
+    fila.parentNode.removeChild(fila); // Eliminar la fila
+    
+    // Eliminar el producto del array notaVenta
+    notaVenta = notaVenta.filter(function(item) {
+        return !(item.producto === producto && item.abreviatura === abreviatura);
+//ACTUALIZAR NOTAVENTA
+
+    });
+
+    // Actualizar el total general después de eliminar una fila
+    calcularTotalGeneral();
+}
+    console.log(notaVenta);
+
+    // Calcular el total general de la venta
+    function calcularTotalGeneral() {
+        console.log("hola")
+        var tabla = document.getElementById('nota-venta-body');
+        var filas = tabla.getElementsByTagName('tr');
+        var totalGeneral = 0;
+
+        for (var i = 0; i < filas.length; i++) {
+            var fila = filas[i];
+            var total = parseFloat(fila.cells[4].textContent);
+            totalGeneral += total;
+        }
+
+        document.getElementById('total-general').textContent = totalGeneral.toFixed(2);
+    }
+
+    // Restablecer el formulario
+    function resetForm() {
+        document.getElementById('producto-input').selectedIndex = 0;
+        document.getElementById('abreviatura-input').value = '';
+        document.getElementById('cantidad-input').value = 1;
+        document.getElementById('precio-input').value = '';
+    }
+
+    function mostrarCamposDePago() {
+        var formaPago = document.getElementById('formaPago').value;
+        var campoEfectivo = document.getElementById('campo-efectivo');
+        var campoTransferenciaTarjeta = document.getElementById('campo-transferencia-tarjeta');
+        var campoCambio = document.getElementById('campo-cambio');
+
+        // Ocultar todos los campos inicialmente
+        campoEfectivo.style.display = 'none';
+        campoTransferenciaTarjeta.style.display = 'none';
+        campoCambio.style.display = 'none';
+
+        // Mostrar campos según la forma de pago seleccionada
+        if (formaPago === 'Efectivo') {
+            campoEfectivo.style.display = 'block';
+            campoCambio.style.display = 'block';
+        } else if (formaPago === 'Tarjeta' || formaPago === 'Transferencia') {
+            campoTransferenciaTarjeta.style.display = 'block';
+        }
+    }
+
+        // Capturamos la forma de pago y el efectivo recibido
+        const formaPago = document.querySelector("#formaPago").value;
+    const TransferenciaTarjetaRecibido = document.getElementById('TransferenciaTarjetaRecibido').value;
+    const efectivoRecibido = document.querySelector("#efectivoRecibido").value;
+    const totalGeneral = document.querySelector("#total-general").textContent;
+
+    // Construimos el JSON con todos los datos
+    const datos = {
+        notaVenta: notaVenta,
+        formaPago: formaPago,
+        efectivoRecibido: efectivoRecibido,
+        TransferenciaTarjetaRecibido:TransferenciaTarjetaRecibido,
+        totalGeneral: totalGeneral
+    };
+    
+    function enviarNotaVenta() {
+    // Capturamos la forma de pago y el efectivo recibido
+    const formaPago = document.querySelector("#formaPago").value;
+    const TransferenciaTarjetaRecibido = parseFloat(document.getElementById('TransferenciaTarjetaRecibido').value) || 0;
+    const efectivoRecibido = parseFloat(document.querySelector("#efectivoRecibido").value) || 0;
+    const totalGeneral = parseFloat(document.querySelector("#total-general").textContent);
+
+    // Calculamos el total recibido
+    const totalRecibido = efectivoRecibido + TransferenciaTarjetaRecibido;
+
+    // Construimos el JSON con todos los datos
+    const datos = {
+        notaVenta: notaVenta,
+        formaPago: formaPago,
+        efectivoRecibido: efectivoRecibido,
+        TransferenciaTarjetaRecibido: TransferenciaTarjetaRecibido,
+        totalGeneral: totalGeneral
+    };
+
+    // Enviar la notaVenta mediante fetch
+    fetch('/OrdenesAgregarAdmin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' // Especificar que se enviará JSON
+        },
+        body: JSON.stringify(datos),
+    })
+    .then(response => {
+        if (response.ok) {
+            // Alerta de éxito
+            alert("Venta registrada correctamente.");
+
+            // Verificamos si el total recibido es mayor o igual al total general
+            if (totalRecibido >= totalGeneral) {
+                const cambio = totalRecibido - totalGeneral;
+                // Mostramos el prompt para preguntar si se desea imprimir el ticket
+                if (confirm('¿Desea imprimir el ticket?')) {
+                    // Llamamos a la función para imprimir el ticket
+                    imprimirTicket(notaVenta, totalGeneral, efectivoRecibido, TransferenciaTarjetaRecibido, cambio);
+                }
+            }
+
+            // Redireccionar después de éxito
+            window.location.href = '/V';
+        } else {
+            alert("Hubo un problema al registrar la venta.");
+        }
+    })
+    .catch(error => {
+        console.error("Error al enviar la nota de venta:", error);
+    });
+}
+
+function imprimirTicket(notaVenta, totalAPagar, efectivoRecibido, transferenciaTarjetaRecibido, cambio) {
+    let ticketContent = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Ticket de Venta</title>
+            <style>
+                body {
+                    width: 58mm;
+                    margin: 0 auto;
+                    font-family: Arial, sans-serif;
+                    font-size: 12px;
+                    text-align: center;
+                }
+                h2 {
+                    margin: 0;
+                }
+                p {
+                    margin: 5px 0;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 10px 0;
+                }
+                th, td {
+                    border-bottom: 1px solid #000;
+                    padding: 5px 0;
+                    text-align: center;
+                }
+                th {
+                    background-color: #f2f2f2;
+                }
+            </style>
+        </head>
+        <body>
+            <img src="/static/imagenes/goolima logo negro.png" alt="Logo Goolima" style="width:100px; height:auto;">
+            <h2><strong>Goolima</strong></h2>
+            <p>Amado Nervo 635, La Armonía, 28020 Colima, Col.</p>
+            <p>312 201 0216</p>
+
+            <p>-----Nota de Venta-----</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Artículo</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    notaVenta.forEach(item => {
+        ticketContent += `
+            <tr>
+                <td>${item.producto}</td>
+                <td>${item.cantidad}</td>
+                <td>$${item.precio.toFixed(2)}</td>
+                <td>$${item.total.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+
+    ticketContent += `
+                </tbody>
+            </table>
+            <p><strong>Total: $${totalAPagar.toFixed(2)}</strong></p>
+            <p><strong>Efectivo Recibido: $${efectivoRecibido.toFixed(2)}</strong></p>
+            <p><strong>Transferencia/Tarjeta Recibido: $${transferenciaTarjetaRecibido.toFixed(2)}</strong></p>
+            <p><strong>Cambio: $${cambio.toFixed(2)}</strong></p>
+            <p><strong>Para dudas y aclaraciones, guardar este comprobante.</strong></p>
+            <p><strong>¡Gracias por su compra, vuelva pronto!.</strong></p>
+        </body>
+        </html>
+    `;
+
+    const ventana = window.open('', '_blank');
+    ventana.document.write(ticketContent);
+    ventana.document.close();
+    ventana.print();
+}
+
+
+
+    function enviarOrdenCredito() {
+    // Capturamos la forma de pago y el efectivo recibido
+    const formaPago = document.querySelector("#formaPago").value;
+    const Cliente = document.querySelector("#Cliente").value;
+    const efectivoRecibido = document.querySelector("#efectivoRecibido").value;
+    const totalGeneral = document.querySelector("#total-general").textContent;
+
+    // Construimos el JSON con todos los datos
+    const datos = {
+        notaVenta: notaVenta,
+        Cliente: Cliente,
+        formaPago: formaPago,
+        efectivoRecibido: efectivoRecibido,
+        totalGeneral: totalGeneral
+    };
+
+    // Enviar la notaVenta mediante fetch
+        fetch('/OrdenesCreditoAgregarAdmin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Especificar que se enviará JSON
+            },
+            body: JSON.stringify(datos),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Aquí puedes hacer algo si la respuesta es correcta
+                alert("Venta registrada correctamente.");
+                window.location.href = '/V'; // Redireccionar después de éxito
+            } else {
+                alert("Hubo un problema al registrar la venta.");
+            }
+        })
+        .catch(error => {
+            console.error("Error al enviar la nota de venta:", error);
+        });
+    }
+
+    // Calcular cambio de efectivo
+    function calcularCambio() {
+        var efectivoRecibido = parseFloat(document.getElementById('efectivoRecibido').value);
+        var totalAPagar = parseFloat(document.getElementById('total-a-pagar').textContent);
+
+        if (efectivoRecibido >= totalAPagar) {
+            var cambio = efectivoRecibido - totalAPagar;
+            document.getElementById('cambio').value = cambio.toFixed(2);
+        } else {
+            document.getElementById('cambio').value = 'Cantidad insuficiente';
+        }
+    }
+    document.getElementById('venta-form').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addItem();
+            }
+        });
+
+        // Función para activar la acción de "Cobrar" cuando se presione F4
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'F4') {
+            event.preventDefault(); // Evita la acción predeterminada del F4
+            document.getElementById('boton-terminar').click(); // Simula el click en el botón de Cobrar
+        }
+    });
+        // Evento para mostrar el modal al presionar "Cobrar"
+        document.getElementById('boton-terminar').addEventListener('click', function(event) {
+            event.preventDefault();
+            recopilarDatosNotaVenta(); // Llamar a la función para recopilar datos
+            document.getElementById('total-a-pagar').innerText = totalGeneral.toFixed(2);
+            const modalCobro = new bootstrap.Modal(document.getElementById('modalCobro'));
+            modalCobro.show();
+        });
+
+// Función para copiar los datos de la tabla a la variable notaVenta
+function recopilarDatosNotaVenta() {
+    // Limpiar la variable notaVenta antes de recopilar datos
+    notaVenta = [];
+
+    // Obtener todas las filas de la tabla de nota de venta
+    var filas = document.getElementById('nota-venta-body').getElementsByTagName('tr');
+
+    // Recorrer las filas y almacenar los datos en la variable notaVenta
+    for (var i = 0; i < filas.length; i++) {
+        var fila = filas[i];
+        var producto = fila.cells[0].textContent;
+        var abreviatura = fila.cells[1].textContent;
+        var cantidad = parseInt(fila.cells[2].textContent);
+        var precio = parseFloat(fila.cells[3].textContent);
+        var total = parseFloat(fila.cells[4].textContent);
+
+        // Agregar el objeto a la variable notaVenta
+        notaVenta.push({ producto, abreviatura, cantidad, precio, total });
+    }
+    
+
+}
+
+</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

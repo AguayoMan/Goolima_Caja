@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAG</title>
+    <link rel="icon" href="/static/imagenes/ColoresLogo.png" type="image/png"> <!-- Cambia "/ruta/a/tu/imagen-miniatura.png" por la ruta real de tu imagen -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    body {
+      background: linear-gradient(180deg, #000000, #3a933ac0 50%, #000000),
+                  linear-gradient(90deg, #000000, #12095cc0 50%, #000000);
+      background-blend-mode: screen;
+      background-color: #3bc23bc0; /* Color de fondo verde */
+      background-size: cover;   /* Para que ocupe toda la pantalla */
+  }
+  .table-wrapper {
+      margin: 20px;
+  }
+  .btn-custom {
+      margin-right: 5px;
+  }
+
+  label {
+      color: black;
+  }
+
+  h2, h3 {
+      color: black;
+  }
+</style>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg" style="background-color: black;">
+        <a class="navbar-brand" href="#" style="color: white;">
+            <img src="/static/imagenes/ColoresLogo.png" alt="Logo" style="width: 40px; height: auto;">
+        </a>
+        <a class="navbar-brand" href="#" style="color: white;">
+            <img src="/static/imagenes/goolima logo blanco.png" alt="Logo" style="width: 40px; height: auto;">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                        <i class="fas fa-file-alt"></i> Ordenes
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/O">Pendientes/Abiertas</a></li>
+                        <li><a class="dropdown-item" href="/OC">Pendientes/Abiertas a credito</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                        <i class="fas fa-users"></i> Clientes
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/ClientesDeuda">Creditos</a></li>
+                        <li><a class="dropdown-item" href="/C">Agregar</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                        <i class="fas fa-users"></i> Productos
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/P">Agregar</a></li>
+                        <li><a class="dropdown-item" href="/ProductosEliminar">Eliminar/Editar</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                        <i class="fas fa-file-alt"></i> Usuarios
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/U">Agregar</a></li>
+                        <li><a class="dropdown-item" href="/UsuariosEliminar">Eliminar/Editar</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                        <i class="fas fa-file-alt"></i> Reportes
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/OrdenesPendientes">Inventario</a></li>
+                        <li><a class="dropdown-item" href="/OrdenesPendientes">Ingresos</a></li>
+                    </ul>
+                </li>
+            </ul>
+    
+            <!-- Este ul se mantiene pegado a la derecha -->
+            <ul class="navbar-nav" style="margin-left: auto;">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                        <i class="fas fa-user-circle"></i> {{ session['username'] }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/ClientesConsultarCaja">Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+            
+        </div>
+    </nav>
+    
+
+    <h1>Aqui va el form para Agregar Clientes</h1>
+
+    <div class="container"><form action="/updateC/{{ data[0][0] }}" method="post">
+        <div class="form-group">
+            <label for="exampleCliente">Nombre Cliente</label>
+            <input type="text" class="form-control" id="ClienteNombre" name="NombreCliente" aria-describedby="emailHelp" placeholder="ejemplo: Juan, Juan Perez" value="{{ data[0][1] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="exampleCliente">Telefono</label>
+            <input type="text" class="form-control" id="Telefono" name="Telefono" aria-describedby="emailHelp" placeholder="ejemplo: 3410556556" value="{{ data[0][2] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="exampleCliente">Descuento</label>
+            <td><input type="number" class="form-control" name="Descuento" placeholder="Cantidad" value="{{ data[0][3] }}" required min="0"></td>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Agregar</button>
+    </form>
+    <!-- Bloque para mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="alert-messages">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+</body>
+</html>

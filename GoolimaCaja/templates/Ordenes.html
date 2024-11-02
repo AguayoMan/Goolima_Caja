@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAG</title>
+    <link rel="icon" href="/static/imagenes/ColoresLogo.png" type="image/png">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome (local) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+</head>
+<style>
+    body {
+      background: linear-gradient(180deg, #000000, #3a933ac0 50%, #000000),
+                  linear-gradient(90deg, #000000, #12095cc0 50%, #000000);
+      background-blend-mode: screen;
+      background-color: #3bc23bc0; /* Color de fondo verde */
+      background-size: cover;   /* Para que ocupe toda la pantalla */
+  }
+  .table-wrapper {
+      margin: 20px;
+  }
+  .btn-custom {
+      margin-right: 5px;
+  }
+
+  label {
+      color: black;
+  }
+
+  h2, h3 {
+      color: black;
+  }
+</style>
+<body>
+      <!-- Navbar -->
+<nav class="navbar navbar-expand-lg" style="background-color: black;">
+    <a class="navbar-brand" href="#" style="color: white;">
+        <img src="/static/imagenes/ColoresLogo.png" alt="Logo" style="width: 40px; height: auto;">
+    </a>
+    <a class="navbar-brand" href="#" style="color: white;">
+        <img src="/static/imagenes/goolima logo blanco.png" alt="Logo" style="width: 40px; height: auto;">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-file-alt"></i> Ordenes
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/OC">Pendientes/Abiertas a credito</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-users"></i> Clientes
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/ClientesDeuda">Creditos</a></li>
+                    <li><a class="dropdown-item" href="/C">Agregar</a></li>
+                    <li><a class="dropdown-item" href="/ClientesEliminar">Eliminar/Editar</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-users"></i> Productos
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/P">Agregar</a></li>
+                    <li><a class="dropdown-item" href="/ProductosEliminar">Eliminar/Editar</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-file-alt"></i> Usuarios
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/U">Agregar</a></li>
+                    <li><a class="dropdown-item" href="/UsuariosEliminar">Eliminar/Editar</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-file-alt"></i> Reportes
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/OrdenesPendientes">Inventario</a></li>
+                    <li><a class="dropdown-item" href="/OrdenesPendientes">Ingresos</a></li>
+                </ul>
+            </li>
+        </ul>
+
+        <!-- Este ul se mantiene pegado a la derecha -->
+        <ul class="navbar-nav" style="margin-left: auto;">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
+                    <i class="fas fa-user-circle"></i> {{ session['username'] }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/ClientesConsultarCaja">Cerrar Sesión</a></li>
+                </ul>
+            </li>
+        </ul>
+        
+    </div>
+</nav>
+
+
+<h1>Aquí va la tabla de Órdenes</h1>
+
+<div> 
+    <table class="table table-striped table-bordered bg-white">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for orden_id, detalles in ordenes.items() %}
+                <!-- Mostrar OrdenId una sola vez por grupo de productos -->
+                <tr class="bg-light">
+                    <td colspan="5">
+                        <strong>OrdenId: {{ orden_id }} Total: {{ detalles.restante }}</strong>
+                        <button type="button" class="btn btn-success ml-2" onclick="abrirModalCobro('{{ orden_id }}', '{{ detalles.restante }}')">Cobrar</button>
+
+                        <!-- Botón para expandir/contraer detalles de la orden con flecha -->
+                        <button class="btn btn-link btn-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ orden_id }}" aria-expanded="false">
+                            <i class="arrow fas fa-chevron-down"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Detalles de los productos asociados a esa OrdenId -->
+                <tr class="collapse" id="collapse{{ orden_id }}">
+                    <td colspan="5">
+                        <table class="table table-sm">
+                            <tbody>
+                                {% for producto in detalles.productos %}
+                                    <tr>
+                                        <td>{{ producto.nombre }}</td>
+                                        <td>{{ producto.cantidad }}</td>
+                                        <td>{{ producto.precio }}</td>
+                                        <td>{{ producto.total_final }}</td>
+                                        <td>
+                                            <!-- Campo para ingresar la cantidad a eliminar -->
+                                            <input type="number" min="1" max="{{ producto.cantidad }}" id="cantidadEliminar_{{ orden_id }}_{{ producto.nombre }}" placeholder="Cantidad a eliminar">
+                                            <button type="button" class="btn btn-primary" onclick="verificarCodigoAntesDeEliminar('{{ orden_id }}', '{{ producto.nombre }}')">Borrar</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Modal de Cobro -->
+<div class="modal fade" id="modalCobro" tabindex="-1" aria-labelledby="modalCobroLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCobroLabel">Cobro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Total a Pagar: $<span id="total-a-pagar">0.00</span></strong></p>
+                <div class="form-group">
+                    <label for="formaPago">Forma de Pago</label>
+                    <select class="form-select" id="formaPago" name="formaPago" required onchange="mostrarCamposDePago()">
+                        <option disabled selected value="">Seleccionar forma de pago</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Tarjeta">Tarjeta debito/credito</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+                </div>
+
+                <!-- Campo para ingresar el efectivo recibido -->
+                <div class="form-group mt-3" id="campo-efectivo" style="display: none;">
+                    <label for="efectivoRecibido">Efectivo Recibido</label>
+                    <input type="number" class="form-control" id="efectivoRecibido" placeholder="Ingresa la cantidad de efectivo" min="0" oninput="calcularCambio()">
+                </div>
+
+                <!-- Campo para ingresar el monto de transferencia/tarjeta -->
+                <div class="form-group mt-3" id="campo-transferencia-tarjeta" style="display: none;">
+                    <label for="transferenciaTarjetaRecibido">Monto Tarjeta/Transferencia</label>
+                    <input type="number" class="form-control" id="TransferenciaTarjetaRecibido" placeholder="Ingresa la cantidad a pagar" min="0">
+                </div>
+
+                <!-- Campo para mostrar el cambio -->
+                <div class="form-group mt-3" id="campo-cambio" style="display: none;">
+                    <label for="cambio">Cambio</label>
+                    <input type="text" class="form-control" id="cambio" placeholder="Cambio" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" onclick="enviarNotaVenta()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Cargar scripts al final del body -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+    function abrirModalCobro(ordenId, totalAPagar) {
+    // Establecer el total a pagar en el modal
+    document.getElementById('total-a-pagar').textContent = totalAPagar;
+    // Guardar el ordenId en un campo oculto (si es necesario)
+    document.getElementById('modalCobro').setAttribute('data-orden-id', ordenId);
+
+    // Mostrar el modal
+    let modal = new bootstrap.Modal(document.getElementById('modalCobro'));
+    modal.show();
+}
+
+function mostrarCamposDePago() {
+    const formaPago = document.getElementById('formaPago').value;
+
+    // Mostrar/ocultar campos en base a la forma de pago seleccionada
+    if (formaPago === 'Efectivo') {
+        document.getElementById('campo-efectivo').style.display = 'block';
+        document.getElementById('campo-transferencia-tarjeta').style.display = 'none';
+        document.getElementById('campo-cambio').style.display = 'block';  // Mostrar campo de cambio
+    } else {
+        document.getElementById('campo-efectivo').style.display = 'none';
+        document.getElementById('campo-transferencia-tarjeta').style.display = 'block';
+        document.getElementById('campo-cambio').style.display = 'none';  // Ocultar campo de cambio
+    }
+}
+
+function calcularCambio() {
+    const totalAPagar = parseFloat(document.getElementById('total-a-pagar').textContent);
+    const efectivoRecibido = parseFloat(document.getElementById('efectivoRecibido').value || 0);
+    const cambio = efectivoRecibido - totalAPagar;
+
+    document.getElementById('cambio').value = cambio >= 0 ? cambio.toFixed(2) : '0.00';
+}
+
+function imprimirTicket(detalles, totalAPagar, efectivoRecibido, transferenciaTarjetaRecibido, cambio) {
+    let ticketHTML = `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Boleto de Venta</title>
+        <style>
+            body {
+                width: 58mm;
+                margin: 0 auto;
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                text-align: center;
+            }
+            h2 {
+                margin: 0;
+            }
+            p {
+                margin: 5px 0;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 10px 0;
+            }
+            th, td {
+                border-bottom: 1px solid #000;
+                padding: 5px 0;
+                text-align: center;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <img src="/static/imagenes/goolima logo negro.png" alt="Logo Goolima" style="width:100px; height:auto;">
+        <h2><strong>Goolima</strong></h2>
+        <p>Amado Nervo 635, La Armonía, 28020 Colima, Col.</p>
+        <p>312 201 0216</p>
+        <p>-----Nota de Venta-----</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Artículo</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    // Iterar sobre los detalles de la orden y agregar filas al ticket
+    detalles.productos.forEach(producto => {
+        const precio = parseFloat(producto.precio) || 0;  // Asegurarse de que el precio sea un número
+        const totalFinal = parseFloat(producto.total_final) || 0;  // Asegurarse de que el total sea un número
+
+        ticketHTML += `
+            <tr>
+                <td>${producto.nombre}</td>
+                <td>${producto.cantidad}</td>
+                <td>${precio.toFixed(2)}</td>
+                <td>${totalFinal.toFixed(2)}</td>
+            </tr>`;
+    });
+
+    ticketHTML += `
+            </tbody>
+        </table>
+        <p><strong>Total: $${totalAPagar.toFixed(2)}</strong></p>
+        <p><strong>Efectivo Recibido: $${efectivoRecibido.toFixed(2)}</strong></p>
+        <p><strong>Transferencia/Tarjeta Recibido: $${transferenciaTarjetaRecibido.toFixed(2)}</strong></p>
+        <p><strong>Cambio: $${cambio.toFixed(2)}</strong></p>
+        <p><strong>Para dudas y aclaraciones, guarde este comprobante.</strong></p>
+    </body>
+    </html>`;
+
+    const ventana = window.open('', '_blank');
+    ventana.document.write(ticketHTML);
+    ventana.document.close();
+    ventana.print();
+
+    // Redirigir a "Ordenes.html" después de imprimir
+    ventana.onafterprint = function() {
+        window.location.href = '/O';
+    };
+}
+
+
+
+function enviarNotaVenta() {
+    const ordenId = document.getElementById('modalCobro').getAttribute('data-orden-id');
+    const totalAPagar = parseFloat(document.getElementById('total-a-pagar').textContent);
+    const formaPago = document.getElementById('formaPago').value;
+    const efectivoRecibido = parseFloat(document.getElementById('efectivoRecibido').value || 0);
+    const transferenciaTarjetaRecibido = parseFloat(document.getElementById('TransferenciaTarjetaRecibido').value || 0);
+    const cambio = parseFloat(document.getElementById('cambio').value || 0);
+
+    const datosCobro = {
+        ordenId: ordenId,
+        totalAPagar: totalAPagar,
+        formaPago: formaPago,
+        efectivoRecibido: efectivoRecibido,
+        transferenciaTarjetaRecibido: transferenciaTarjetaRecibido,
+        cambio: cambio
+    };
+
+    fetch('/procesarCobro', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datosCobro)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Obtener los detalles de la orden para el ticket
+            fetch(`/obtenerDetallesOrden/${ordenId}`)
+            .then(response => response.json())
+            .then(ordenDetalles => {
+                if (ordenDetalles) {
+                    let deseaImprimir = confirm("¿Desea imprimir el ticket?");
+                    if (deseaImprimir) {
+                        imprimirTicket(ordenDetalles, totalAPagar, efectivoRecibido, transferenciaTarjetaRecibido, cambio);
+                    } else {
+                        window.location.href = '/O';  // Redirigir a Ordenes.html si no imprime
+                    }
+                } else {
+                    alert('Error al obtener los detalles de la orden.');
+                }
+            });
+        } else {
+            alert('Hubo un error al procesar el cobro.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al procesar el cobro:', error);
+    });
+}
+
+function verificarCodigoAntesDeEliminar(ordenId, nombreProducto) {
+    // Solicitar la contraseña o código al usuario
+    let codigoIngresado = prompt("Ingrese la contraseña del Administrador/Supervisor:");
+    
+    // Verificar la contraseña ingresada
+    if (codigoIngresado) {
+        fetch('/verificar_contraseña', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ codigo: codigoIngresado })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Contraseña incorrecta o usuario no autorizado');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.valid) {
+                // Si la contraseña es válida, obtener la cantidad a eliminar
+                const cantidadEliminar = document.getElementById(`cantidadEliminar_${ordenId}_${nombreProducto}`).value;
+                
+                if (!cantidadEliminar || cantidadEliminar <= 0) {
+                    alert("Por favor ingresa una cantidad válida.");
+                    return;
+                }
+                
+                // Redirigir a la ruta de eliminación con la cantidad especificada
+                window.location.href = `/deleteP/${ordenId}/${nombreProducto}/${cantidadEliminar}`;
+            } else {
+                alert("Contraseña incorrecta o usuario no autorizado");
+            }
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+}
+
+</script>
+
+
+
+<script>
+    // Inicializar el colapso correctamente
+    $(document).on('click', '.btn-toggle', function() {
+        $(this).toggleClass('collapsed');
+    });
+
+    // Verificar si jQuery está cargado
+    if (typeof $ === 'undefined') {
+        console.log('jQuery no está cargado correctamente');
+    } else {
+        console.log('jQuery está cargado');
+    }
+</script>
+
+</body>
+</html>

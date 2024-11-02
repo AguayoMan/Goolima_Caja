@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAG</title>
+    <link rel="icon" href="/static/imagenes/ColoresLogo.png" type="image/png"> <!-- Cambia "/ruta/a/tu/imagen-miniatura.png" por la ruta real de tu imagen -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Agrega la referencia a la biblioteca Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0; /* Elimina el margen predeterminado del cuerpo */
+            height: 100vh; /* Establece la altura del cuerpo al 100% de la ventana */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2e2c2c; /* Ejemplo de color de fondo */
+        }
+        .container {
+            text-align: center;
+            color: white;
+        }
+        img {
+            max-width: 35%; /* Hace que la imagen no supere su tamaño original */
+            height: auto; /* Mantiene la relación de aspecto original de la imagen */
+            margin: 0 auto; /* Centra la imagen horizontalmente */
+        }
+        button {
+            border: none;
+            padding: 0;
+            background: none;
+            cursor: pointer;
+        }
+        .form-container {
+            width: 100%;
+            max-width: 400px; /* Establece un ancho máximo para el formulario */
+            margin: 20px auto; /* Centra el formulario horizontalmente */
+        }
+        .full-width-line {
+            width: 100%;
+            border-top: 1px solid #ccc; /* Establece el estilo y el color de la línea */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='imagenes/ColoresLogo.png') }}" alt="Ejemplo de imagen">
+        <div class="form-container">
+            <form action="/buscar_usuario" method="post">
+                <div class="form-group">
+                    <label for="UsuarioID">Usuario</label>
+                    <input type="text" class="form-control" id="UsuarioID" name="usuario" aria-describedby="emailHelp" placeholder="ejemplo: Chavira58" required>
+                </div>
+                <div class="form-group">
+                    <label for="ContraseñaID">Contraseña</label>
+                    <input type="password" class="form-control" id="ContraseñaID" name="contraseña" placeholder="asd1234" required>
+                </div>
+                <!-- Bloque para mostrar mensajes flash -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="alert-messages">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                <button type="submit" class="btn btn-primary">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-p3fuqTyWy5SfJczz8eOk0WZpMmVo2DJSvMa9GOK3rjEtm5C7o8x4qfQ63Tgox6K2" crossorigin="anonymous"></script>
+</body>
+</html>
